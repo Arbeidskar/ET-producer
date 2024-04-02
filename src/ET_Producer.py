@@ -13,9 +13,9 @@ from datetime import datetime
 from subprocess import run, DEVNULL
 from tkinter import messagebox, filedialog, Label, StringVar, Menu
 
-MUNICIPALITY_LIST = sorted(["4602 Kinn Kommune", "4619 Eidfjord Kommune", "4635 Gulen Kommune", "4636 Solund Kommune", "4637 Hyllestad Kommune", "4638 Høyanger Kommune", "4639 Vik Kommune", "4640 Sogndal Kommune", "4641 Aurland Kommune", "4642 Lærdal Kommune", "4643 Årdal Kommune", "4644 Luster Kommune", "4645 Askvoll Kommune", "4646 Fjaler Kommune", "4647 Sunnfjord Kommune", "4648 Bremanger Kommune", "4649 Stad Kommune", "4650 Gloppen Kommune","4651 Stryn Kommune"], key=lambda x: x.split(" ")[1])
-SYSTEM_LIST = sorted(["ESA", "Visma Velferd", "Visma Familia", "Visma HsPro", "WinMed Helse", "Ephorte", "Visma Flyt Skole", "Visma Profil", "SystemX", "P360", "Digora", "Oppad", "CGM Helsestasjon", "Visma Flyt Sampro", "Gerica", "Socio"])
-USERNAME = "admin"
+MUNICIPALITY_LIST = sorted(["4600 Vestland Fylkeskommune", "4602 Kinn Kommune", "4635 Gulen Kommune", "4636 Solund Kommune", "4637 Hyllestad Kommune", "4638 Høyanger Kommune", "4639 Vik Kommune", "4640 Sogndal Kommune", "4641 Aurland Kommune", "4642 Lærdal Kommune", "4643 Årdal Kommune", "4644 Luster Kommune", "4645 Askvoll Kommune", "4646 Fjaler Kommune", "4647 Sunnfjord Kommune", "4648 Bremanger Kommune", "4649 Stad Kommune", "4650 Gloppen Kommune","4651 Stryn Kommune"], key=lambda x: x.split(" ")[1])
+SYSTEM_LIST = sorted(["WebSak", "Elements", "Infodoc", "HK Oppvekst", "ESA", "Visma Velferd", "Otto", "Sats", "Psykbase", "CosDoc", "Psykbase", "CosDoc", "Visma Familia", "Visma HsPro", "WinMed Helse", "Ephorte", "Visma Flyt Skole", "Visma Profil", "SystemX", "P360", "Digora", "Oppad", "CGM Helsestasjon", "Visma Flyt Sampro", "Gerica", "Socio"])
+USERNAME = "klsk"
 
 #Function to browse computer for files
 def browse_files(label: Label):
@@ -61,9 +61,10 @@ def gather_file_info(directory: str, prefix: str) -> dict:
 #Packages the sip into a tarfile
 def pack_sip(sip_tarfile: str, id: str, content_path: str):
     logging("Packaging sip...")
-    run(f'{os.environ["PROGRAMFILES"]}\\7-Zip\\7z.exe a {sip_tarfile}.tar {sip_tarfile} -aou -sdel', stdout=DEVNULL, stderr=DEVNULL)
-    run(f'{os.environ["PROGRAMFILES"]}\\7-Zip\\7z.exe a {sip_tarfile}.tar "{content_path}"', stdout=DEVNULL, stderr=DEVNULL)
-    run(f'{os.environ["PROGRAMFILES"]}\\7-Zip\\7z.exe rn {sip_tarfile}.tar -r "{os.path.basename(content_path)}\\" {id}\\content\\', stdout=DEVNULL, stderr=DEVNULL)
+    #run(f'7z a {sip_tarfile}.tar sip_tarfile -aou -sdel', stdout=DEVNULL, stderr=DEVNULL)
+    run(f'7z a {sip_tarfile}.tar {sip_tarfile} -aou -sdel', shell=True, stdout=DEVNULL, stderr=DEVNULL)
+    run(f'7z a {sip_tarfile}.tar "{content_path}"', shell=True, stdout=DEVNULL, stderr=DEVNULL)
+    run(f'7z rn {sip_tarfile}.tar -r "{os.path.basename(content_path)}/" {id}/content/{os.path.basename(content_path)}/', shell=True, stdout=DEVNULL, stderr=DEVNULL)
 
 def configure_sip_log(log_path: str, id: str, create_date: str):
     logging("Configuring sip log.xml...")
@@ -144,17 +145,18 @@ def main_func():
         tarfile = f'{output_folder}/{sip_id}/content/{sip_id}'
 
         #Build EPP-ready structure
-        os.makedirs(f'{output_folder}/{sip_id}/administrative_metadata/repository_operations')
-        os.makedirs(f'{output_folder}/{sip_id}/descriptive_metadata')
-        os.makedirs(f'{tarfile}/administrative_metadata')
-        os.makedirs(f'{tarfile}/descriptive_metadata')
-        os.makedirs(f'{tarfile}/content')
-        shutil.copy(os.path.join(sys._MEIPASS, "files/mets.xsd"), f'{tarfile}/mets.xsd')
-        shutil.copy(os.path.join(sys._MEIPASS, "files/DIAS_PREMIS.xsd"), f'{tarfile}/administrative_metadata/DIAS_PREMIS.xsd')
+        os.makedirs(f'{output_folder}/{sip_id}/administrative_metadata/repository_operations', exist_ok=True)
+        os.makedirs(f'{output_folder}/{sip_id}/descriptive_metadata', exist_ok=True)
+        os.makedirs(f'{tarfile}/administrative_metadata', exist_ok=True)
+        os.makedirs(f'{tarfile}/descriptive_metadata', exist_ok=True)
+        os.makedirs(f'{tarfile}/content', exist_ok=True) 
+        shutil.copy(os.path.join(sys._MEIPASS, "files/mets.xsd"), f'{tarfile}/mets.xsd') #Replace sys._MEIPASS, with path to filesfolder to run i terminal
+        shutil.copy(os.path.join(sys._MEIPASS, "files/DIAS_PREMIS.xsd"), f'{tarfile}/administrative_metadata/DIAS_PREMIS.xsd') #Replace sys._MEIPASS, with path to filesfolder to run in terminal
         if descriptive_path_label.cget("text"):
             shutil.copytree(os.path.abspath(descriptive_path_label.cget("text")), f'{tarfile}/descriptive_metadata', copy_function=shutil.copy, dirs_exist_ok=True)
         if administrative_path_label.cget("text"):
             shutil.copytree(os.path.abspath(administrative_path_label.cget("text")), f'{tarfile}/administrative_metadata', copy_function=shutil.copy, dirs_exist_ok=True)
+
 
         #Zone 1 (ETP)
         configure_sip_log(f'{tarfile}/log.xml', str(sip_id), datetime.now().strftime("%Y-%m-%dT%H:%M:%S+02:00"))
@@ -318,4 +320,4 @@ menu.add_command(label='Import mets.xml Metadata', command=lambda: import_metada
 window.config(menu=menu)
 
 #Runs the main window and keeps it going
-window.mainloop()
+window.mainloop() 
