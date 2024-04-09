@@ -15,7 +15,7 @@ from tkinter import messagebox, filedialog, Label, StringVar, Menu
 
 MUNICIPALITY_LIST = sorted(["4600 Vestland Fylkeskommune", "4602 Kinn Kommune", "4635 Gulen Kommune", "4636 Solund Kommune", "4637 Hyllestad Kommune", "4638 Høyanger Kommune", "4639 Vik Kommune", "4640 Sogndal Kommune", "4641 Aurland Kommune", "4642 Lærdal Kommune", "4643 Årdal Kommune", "4644 Luster Kommune", "4645 Askvoll Kommune", "4646 Fjaler Kommune", "4647 Sunnfjord Kommune", "4648 Bremanger Kommune", "4649 Stad Kommune", "4650 Gloppen Kommune","4651 Stryn Kommune"], key=lambda x: x.split(" ")[1])
 SYSTEM_LIST = sorted(["WebSak", "Elements", "Infodoc", "HK Oppvekst", "ESA", "Visma Velferd", "Otto", "Sats", "Psykbase", "CosDoc", "Psykbase", "CosDoc", "Visma Familia", "Visma HsPro", "WinMed Helse", "Ephorte", "Visma Flyt Skole", "Visma Profil", "SystemX", "P360", "Digora", "Oppad", "CGM Helsestasjon", "Visma Flyt Sampro", "Gerica", "Socio"])
-USERNAME = "klsk"
+USERNAME = "admin"
 
 #Function to browse computer for files
 def browse_files(label: Label):
